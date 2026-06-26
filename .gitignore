@@ -7,11 +7,12 @@ __pycache__/
 .pytest_tmp/
 .ruff_cache/
 .mypy_cache/
-storage/uploads/*
-storage/generated/*
-storage/exports/*
-storage/test_runs/*
+!storage/uploads/*
+!storage/generated/*
+!storage/exports/*
+!storage/test_runs/*
 storage/app.db
 !storage/uploads/.gitkeep
 !storage/generated/.gitkeep
 !storage/exports/.gitkeep
+!storage/test_runs/.gitkeep
