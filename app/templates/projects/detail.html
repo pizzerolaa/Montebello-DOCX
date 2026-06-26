@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>{{ project.name }}</h1>
+      <p>{{ project.center_name or "Centro pendiente de revision" }}</p>
+    </div>
+    <div class="actions">
+      <a class="button-outline" href="{{ url_for('project_upload', project_id=project.id) }}">Agregar documentos</a>
+      <form method="post" action="{{ url_for('project_analyze', project_id=project.id) }}">
+        <button type="submit">Analizar</button>
+      </form>
+      <a class="button-outline" href="{{ url_for('project_generate', project_id=project.id) }}">Generar</a>
+    </div>
+  </section>
+
+  {% set active_step = 1 %}
+  {% include "components/stepper.html" %}
+
+  <section class="grid-two">
+    <article class="panel">
+      <h2>Datos generales</h2>
+      <dl class="details">
+        <dt>Estado</dt><dd><span class="badge">{{ project.status }}</span></dd>
+        <dt>Centro</dt><dd>{{ project.center_name or "Pendiente" }}</dd>
+        <dt>Pedido</dt><dd>{{ project.order_number or "Pendiente" }}</dd>
+        <dt>Fecha de servicio</dt><dd>{{ project.service_date_raw or project.service_date or "Pendiente" }}</dd>
+      </dl>
+    </article>
+    <article class="panel">
+      <h2>Documentos fuente</h2>
+      {% if project.source_documents %}
+        <ul class="document-list">
+          {% for document in project.source_documents %}
+            <li>
+              <div>
+                <strong>{{ document.original_filename }}</strong>
+                <span>{{ document.processing_status }} · {{ document.file_size or 0 }} bytes</span>
+              </div>
+              <form method="post" action="{{ url_for('project_document_delete_form', project_id=project.id, document_id=document.id) }}" data-confirm="Eliminar este documento?">
+                <button type="submit" class="button-link danger">Eliminar</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">Todavia no hay documentos cargados.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  {% if project.equipment %}
+    <section class="panel">
+      <h2>Equipos detectados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo</th>
+            <th>Zona</th>
+            <th>Marca</th>
+            <th>Capacidad</th>
+            <th>Serie</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipment in project.equipment %}
+            <tr>
+              <td>{{ equipment.sequence }}</td>
+              <td>{{ equipment.equipment_type }}</td>
+              <td>{{ equipment.zone or "Pendiente" }}</td>
+              <td>{{ equipment.brand or "Pendiente" }}</td>
+              <td>{{ equipment.capacity or "Pendiente" }}</td>
+              <td>{{ equipment.serial or "Pendiente" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('project_delete_form', project_id=project.id) }}" data-confirm="Eliminar el proyecto y sus archivos?">
+    <button type="submit" class="button-outline danger">Eliminar proyecto</button>
+  </form>
+{% endblock %}

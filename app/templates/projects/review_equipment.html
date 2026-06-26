@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Revision de equipos{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>Revision de equipos</h1>
+      <p>{{ project.name }}</p>
+    </div>
+    <a class="button" href="{{ url_for('review_work', project_id=project.id) }}">Revisar trabajos</a>
+  </section>
+
+  {% set active_step = 3 %}
+  {% include "components/stepper.html" %}
+
+  <section class="panel table-scroll">
+    <h2>Equipos detectados</h2>
+    {% if project.equipment %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lote</th>
+            <th>Tipo</th>
+            <th>Zona</th>
+            <th>Marca</th>
+            <th>Capacidad</th>
+            <th>Serie</th>
+            <th>Notas</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipment in project.equipment %}
+            <tr>
+              <form method="post" action="{{ url_for('equipment_update_form', project_id=project.id, equipment_id=equipment.id) }}">
+                <td>{{ equipment.sequence }}</td>
+                <td>
+                  <select name="lot_id">
+                    <option value="">Sin lote</option>
+                    {% for lot in project.lots %}
+                      <option value="{{ lot.id }}" {% if equipment.lot_id == lot.id %}selected{% endif %}>{{ lot.lot_number }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td>
+                  <select name="equipment_type">
+                    {% for value in ["MINISPLIT", "PACKAGE", "COLD_ROOM", "UNKNOWN"] %}
+                      <option value="{{ value }}" {% if equipment.equipment_type == value %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td><input type="text" name="zone" value="{{ equipment.zone or '' }}"></td>
+                <td><input type="text" name="brand" value="{{ equipment.brand or '' }}"></td>
+                <td><input type="text" name="capacity" value="{{ equipment.capacity or '' }}"></td>
+                <td><input type="text" name="serial" value="{{ equipment.serial or '' }}"></td>
+                <td><textarea name="notes" rows="3">{{ equipment.notes or '' }}</textarea></td>
+                <td class="stacked-actions">
+                  <button type="submit" class="button-small">Guardar</button>
+              </form>
+                  <form method="post" action="{{ url_for('equipment_delete_form', project_id=project.id, equipment_id=equipment.id) }}" data-confirm="Eliminar este equipo?">
+                    <button type="submit" class="button-link danger">Eliminar</button>
+                  </form>
+                  {% if project.equipment | length > 1 %}
+                    <form method="post" action="{{ url_for('equipment_merge', project_id=project.id, equipment_id=equipment.id) }}">
+                      <select name="target_equipment_id" aria-label="Equipo destino">
+                        {% for target in project.equipment %}
+                          {% if target.id != equipment.id %}
+                            <option value="{{ target.id }}">Fusionar en #{{ target.sequence }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                      <button type="submit" class="button-link">Fusionar</button>
+                    </form>
+                  {% endif %}
+                </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">No hay equipos. Agrega uno manualmente.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Agregar equipo</h2>
+    <form method="post" action="{{ url_for('equipment_create', project_id=project.id) }}" class="compact-form">
+      <select name="lot_id" aria-label="Lote">
+        <option value="">Sin lote</option>
+        {% for lot in project.lots %}
+          <option value="{{ lot.id }}">{{ lot.lot_number }}</option>
+        {% endfor %}
+      </select>
+      <select name="equipment_type" aria-label="Tipo">
+        <option value="MINISPLIT">MINISPLIT</option>
+        <option value="PACKAGE">PACKAGE</option>
+        <option value="COLD_ROOM">COLD_ROOM</option>
+        <option value="UNKNOWN">UNKNOWN</option>
+      </select>
+      <input type="text" name="zone" placeholder="Zona">
+      <input type="text" name="brand" placeholder="Marca">
+      <input type="text" name="capacity" placeholder="Capacidad">
+      <input type="text" name="serial" placeholder="Serie">
+      <button type="submit">Agregar</button>
+    </form>
+  </section>
+{% endblock %}

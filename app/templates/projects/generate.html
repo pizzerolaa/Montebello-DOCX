@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Generar{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>Generar archivos</h1>
+      <p>{{ project.name }}</p>
+    </div>
+    <a class="button-outline" href="{{ url_for('project_detail', project_id=project.id) }}">Volver al proyecto</a>
+  </section>
+
+  {% set active_step = 5 %}
+  {% include "components/stepper.html" %}
+
+  <section class="panel">
+    <h2>Generacion</h2>
+    <div class="action-grid">
+      <form method="post" action="{{ url_for('project_generate_post', project_id=project.id) }}">
+        <input type="hidden" name="action" value="excel">
+        <button type="submit">Exportar Excel</button>
+      </form>
+      <form method="post" action="{{ url_for('project_generate_post', project_id=project.id) }}">
+        <input type="hidden" name="action" value="acta">
+        <button type="submit">Generar ACTA</button>
+      </form>
+      <form method="post" action="{{ url_for('project_generate_post', project_id=project.id) }}">
+        <input type="hidden" name="action" value="annex">
+        <button type="submit">Generar ANEXO</button>
+      </form>
+      <form method="post" action="{{ url_for('project_generate_post', project_id=project.id) }}">
+        <input type="hidden" name="action" value="zip">
+        <button type="submit">Crear ZIP</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Archivos disponibles</h2>
+    {% if project.generated_artifacts %}
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Archivo</th>
+            <th>Creado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for artifact in project.generated_artifacts %}
+            <tr>
+              <td>{{ artifact.artifact_type }}</td>
+              <td>{{ artifact.filename }}</td>
+              <td>{{ artifact.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+              <td><a href="{{ url_for('project_artifact_download', project_id=project.id, artifact_id=artifact.id) }}">Descargar</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">Todavia no hay archivos generados.</p>
+    {% endif %}
+  </section>
+{% endblock %}

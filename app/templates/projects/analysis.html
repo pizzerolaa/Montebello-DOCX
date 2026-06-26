@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Analisis{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>Resultado del analisis</h1>
+      <p>{{ project.name }}</p>
+    </div>
+    <div class="actions">
+      <a class="button-outline" href="{{ url_for('project_detail', project_id=project.id) }}">Ver proyecto</a>
+      <a class="button" href="{{ url_for('review_general', project_id=project.id) }}">Continuar a revision</a>
+    </div>
+  </section>
+
+  {% set active_step = 2 %}
+  {% include "components/stepper.html" %}
+
+  <section class="grid-two">
+    <article class="panel">
+      <h2>Datos detectados</h2>
+      <dl class="details">
+        <dt>Centro</dt><dd>{{ project.center_name or "Pendiente" }}</dd>
+        <dt>Pedido</dt><dd>{{ project.order_number or "Pendiente" }}</dd>
+        <dt>Fecha servicio</dt><dd>{{ project.service_date_raw or "Pendiente" }}</dd>
+        <dt>Contrato</dt><dd>{{ project.contract_date_raw or "Pendiente" }}</dd>
+        <dt>Lotes</dt><dd>{{ project.lots | map(attribute="lot_number") | join(", ") or "Pendiente" }}</dd>
+      </dl>
+    </article>
+    <article class="panel">
+      <h2>Resumen de equipos</h2>
+      {% if counts %}
+        <ul>
+          {% for equipment_type, count in counts.items() %}
+            <li>{{ equipment_type }}: {{ count }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">No se detectaron equipos.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="panel">
+    <h2>Documentos fuente</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Archivo</th>
+          <th>Perfil</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for document in project.source_documents %}
+          <tr>
+            <td>{{ document.original_filename }}</td>
+            <td>{{ document.detected_profile }}</td>
+            <td>{{ document.processing_status }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Equipos</h2>
+    {% if project.equipment %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lote</th>
+            <th>Tipo</th>
+            <th>Zona</th>
+            <th>Marca</th>
+            <th>Capacidad</th>
+            <th>Serie</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipment in project.equipment %}
+            <tr>
+              <td>{{ equipment.sequence }}</td>
+              <td>{{ equipment.lot.lot_number if equipment.lot else "Pendiente" }}</td>
+              <td>{{ equipment.equipment_type }}</td>
+              <td>{{ equipment.zone or "Pendiente" }}</td>
+              <td>{{ equipment.brand or "Pendiente" }}</td>
+              <td>{{ equipment.capacity or "Pendiente" }}</td>
+              <td>{{ equipment.serial or "Pendiente" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">No se detectaron equipos.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Avisos</h2>
+    {% if project.extraction_issues %}
+      <ul class="issue-list">
+        {% for issue in project.extraction_issues %}
+          <li><span class="badge">{{ issue.severity }}</span> {{ issue.message }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No se generaron avisos.</p>
+    {% endif %}
+  </section>
+{% endblock %}

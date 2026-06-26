@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Revision de trabajos{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>Revision de trabajos</h1>
+      <p>{{ project.name }}</p>
+    </div>
+    <a class="button" href="{{ url_for('project_detail', project_id=project.id) }}">Volver al proyecto</a>
+  </section>
+
+  {% set active_step = 4 %}
+  {% include "components/stepper.html" %}
+
+  {% for equipment in project.equipment %}
+    <section class="panel work-panel">
+      <h2>#{{ equipment.sequence }} {{ equipment.equipment_type }} · {{ equipment.zone or "Sin zona" }}</h2>
+      <p class="muted">{{ equipment.brand or "Marca pendiente" }} · {{ equipment.capacity or "Capacidad pendiente" }} · {{ equipment.serial or "Serie pendiente" }}</p>
+
+      {% if equipment.notes %}
+        <details>
+          <summary>Texto fuente preservado</summary>
+          <pre>{{ equipment.notes }}</pre>
+        </details>
+      {% endif %}
+
+      {% if equipment.work_items %}
+        {% for work_item in equipment.work_items %}
+          <form method="post" action="{{ url_for('work_item_update_form', project_id=project.id, work_item_id=work_item.id) }}" class="work-item-form">
+            <label>
+              Titulo
+              <input type="text" name="title" value="{{ work_item.title or '' }}">
+            </label>
+            <label>
+              Descripcion
+              <textarea name="description" rows="3">{{ work_item.description }}</textarea>
+            </label>
+            <div class="actions">
+              <button type="submit" class="button-small">Guardar trabajo</button>
+            </div>
+          </form>
+          <form method="post" action="{{ url_for('work_item_delete_form', project_id=project.id, work_item_id=work_item.id) }}" data-confirm="Eliminar este trabajo?">
+            <button type="submit" class="button-link danger">Eliminar trabajo</button>
+          </form>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No hay trabajos estructurados para este equipo.</p>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('work_item_create', project_id=project.id, equipment_id=equipment.id) }}" class="compact-form">
+        <input type="text" name="title" placeholder="Componente o titulo">
+        <input type="text" name="description" placeholder="Descripcion del trabajo" required>
+        <button type="submit">Agregar trabajo</button>
+      </form>
+    </section>
+  {% else %}
+    <section class="empty-state">
+      <h2>No hay equipos</h2>
+      <p>Agrega equipos antes de revisar trabajos.</p>
+    </section>
+  {% endfor %}
+{% endblock %}

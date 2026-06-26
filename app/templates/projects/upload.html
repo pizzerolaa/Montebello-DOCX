@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Cargar documentos{% endblock %}
+{% block content %}
+  <section class="narrow">
+    <h1>Cargar documentos DOCX</h1>
+    <p>Proyecto: <strong>{{ project.name }}</strong></p>
+    {% set active_step = 1 %}
+    {% include "components/stepper.html" %}
+    {% include "components/alerts.html" %}
+
+    <form method="post" action="{{ url_for('project_documents_create', project_id=project.id) }}" enctype="multipart/form-data" class="form-panel">
+      <label>
+        Documentos Word
+        <input type="file" name="files" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple required>
+      </label>
+      <p class="hint">Solo se aceptan archivos .docx sin macros. Los documentos .docm se rechazan.</p>
+      <div class="actions">
+        <a href="{{ url_for('project_detail', project_id=project.id) }}">Volver</a>
+        <button type="submit">Guardar documentos</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

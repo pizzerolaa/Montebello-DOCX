@@ -1,0 +1,8 @@
+{% if messages %}
+  <section class="alerts" aria-live="polite">
+    {% for message in messages %}
+      <p class="alert">{{ message }}</p>
+    {% endfor %}
+  </section>
+{% endif %}
+

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}No encontrado{% endblock %}
+{% block content %}
+  <section class="empty-state">
+    <h1>No encontrado</h1>
+    <p>No pudimos encontrar el recurso solicitado.</p>
+    <a class="button" href="{{ url_for('project_list') }}">Volver a proyectos</a>
+  </section>
+{% endblock %}
+

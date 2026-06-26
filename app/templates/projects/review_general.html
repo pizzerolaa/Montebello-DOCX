@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Revision general{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>Revision general</h1>
+      <p>{{ project.name }}</p>
+    </div>
+    <a class="button" href="{{ url_for('review_equipment', project_id=project.id) }}">Revisar equipos</a>
+  </section>
+
+  {% set active_step = 3 %}
+  {% include "components/stepper.html" %}
+
+  <form method="post" action="{{ url_for('review_general_update', project_id=project.id) }}" class="form-panel">
+    <div class="form-grid">
+      <label>
+        Nombre del proyecto
+        <input type="text" name="name" value="{{ project.name }}">
+      </label>
+      <label>
+        Centro
+        <input type="text" name="center_name" value="{{ project.center_name or '' }}">
+      </label>
+      <label>
+        Lugar
+        <input type="text" name="location" value="{{ project.location or '' }}">
+      </label>
+      <label>
+        Estado
+        <input type="text" name="state" value="{{ project.state or '' }}">
+      </label>
+      <label>
+        Fecha de servicio
+        <input type="text" name="service_date_raw" value="{{ project.service_date_raw or '' }}">
+      </label>
+      <label>
+        Fecha de contrato
+        <input type="text" name="contract_date_raw" value="{{ project.contract_date_raw or '' }}">
+      </label>
+      <label>
+        Pedido
+        <input type="text" name="order_number" value="{{ project.order_number or '' }}">
+      </label>
+      <label>
+        Cliente
+        <input type="text" name="client_name" value="{{ project.client_name or '' }}">
+      </label>
+    </div>
+
+    <label>
+      Lotes
+      <textarea name="lots_text" rows="4">{% for lot in project.lots %}{{ lot.lot_number }}
+{% endfor %}</textarea>
+    </label>
+
+    {% set deliverer = project.signatures | selectattr("role", "equalto", "DELIVERER") | first %}
+    {% set receiver = project.signatures | selectattr("role", "equalto", "RECEIVER") | first %}
+    <div class="form-grid">
+      <label>
+        Entrega - nombre
+        <input type="text" name="deliverer_name" value="{{ deliverer.name if deliverer else '' }}">
+      </label>
+      <label>
+        Entrega - cargo
+        <input type="text" name="deliverer_position" value="{{ deliverer.position if deliverer else '' }}">
+      </label>
+      <label>
+        Recibe - nombre
+        <input type="text" name="receiver_name" value="{{ receiver.name if receiver else '' }}">
+      </label>
+      <label>
+        Recibe - cargo
+        <input type="text" name="receiver_position" value="{{ receiver.position if receiver else '' }}">
+      </label>
+    </div>
+
+    <div class="actions">
+      <button type="submit">Guardar revision general</button>
+    </div>
+  </form>
+
+  <section class="panel">
+    <h2>Avisos de revision</h2>
+    {% if project.extraction_issues %}
+      <ul class="issue-list">
+        {% for issue in project.extraction_issues %}
+          <li class="{% if issue.resolved %}resolved{% endif %}">
+            <span class="badge">{{ issue.severity }}</span>
+            {{ issue.message }}
+            {% if issue.detected_value %}<span class="muted">({{ issue.detected_value }})</span>{% endif %}
+            {% if not issue.resolved %}
+              <form method="post" action="{{ url_for('review_issue_resolve', project_id=project.id, issue_id=issue.id) }}">
+                <button type="submit" class="button-link">Marcar resuelto</button>
+              </form>
+            {% else %}
+              <span class="muted">Resuelto</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No hay avisos.</p>
+    {% endif %}
+  </section>
+{% endblock %}

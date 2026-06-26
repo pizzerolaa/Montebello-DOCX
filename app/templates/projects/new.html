@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Nuevo proyecto{% endblock %}
+{% block content %}
+  <section class="narrow">
+    <h1>Nuevo proyecto</h1>
+    {% set active_step = 1 %}
+    {% include "components/stepper.html" %}
+    <form method="post" action="{{ url_for('project_create') }}" class="form-panel">
+      <label>
+        Nombre del proyecto
+        <input type="text" name="name" placeholder="Ej. Mantenimiento Junio">
+      </label>
+      <label>
+        Centro o unidad medica
+        <input type="text" name="center_name" placeholder="Opcional; se podra extraer despues">
+      </label>
+      <div class="actions">
+        <a href="{{ url_for('project_list') }}">Cancelar</a>
+        <button type="submit">Crear proyecto</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

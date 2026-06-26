@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Proyectos{% endblock %}
+{% block content %}
+  <section class="page-header">
+    <div>
+      <h1>Proyectos</h1>
+      <p>Administra proyectos internos y sus documentos fuente.</p>
+    </div>
+    <a class="button" href="{{ url_for('project_new') }}">Crear proyecto</a>
+  </section>
+
+  {% if projects %}
+    <table>
+      <thead>
+        <tr>
+          <th>Proyecto</th>
+          <th>Centro</th>
+          <th>Estado</th>
+          <th>Creado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}
+          <tr>
+            <td><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a></td>
+            <td>{{ project.center_name or "Pendiente" }}</td>
+            <td><span class="badge">{{ project.status }}</span></td>
+            <td>{{ project.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+            <td class="table-actions"><a href="{{ url_for('project_upload', project_id=project.id) }}">Cargar DOCX</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <section class="empty-state">
+      <h2>No hay proyectos todavia</h2>
+      <p>Crea un proyecto para comenzar a cargar documentos .docx.</p>
+    </section>
+  {% endif %}
+{% endblock %}
+

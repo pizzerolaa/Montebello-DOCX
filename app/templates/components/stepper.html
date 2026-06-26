@@ -1,0 +1,13 @@
+{% set steps = [
+  ("Carga", 1),
+  ("Analisis", 2),
+  ("Revision", 3),
+  ("Trabajo", 4),
+  ("Generacion", 5)
+] %}
+<ol class="stepper" aria-label="Flujo del proyecto">
+  {% for label, number in steps %}
+    <li class="{% if number == active_step %}active{% endif %}">{{ number }}. {{ label }}</li>
+  {% endfor %}
+</ol>
+
