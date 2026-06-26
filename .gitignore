@@ -7,6 +7,7 @@ __pycache__/
 .pytest_tmp/
 .ruff_cache/
 .mypy_cache/
+.codex_verify/
 !storage/uploads/*
 !storage/generated/*
 !storage/exports/*
